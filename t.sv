@@ -4,7 +4,8 @@ module button_fsm (
     input  logic       clk,    // Clock de 50 MHz
     input  logic       rst_n,  // Reset assincrono, ativo baixo (KEY[0])
     input  logic [3:0] btn,    // Botao de avanco, ativo baixo  (KEY[1])
-    output logic [3:0] leds    // LEDs indicadores de estado
+    output logic [3:0] leds,   // LEDs indicadores de estado
+    output logic       unlock
 );
 
 typedef enum logic [3:0] {
@@ -61,6 +62,7 @@ always_comb begin
     endcase
 end
 
+assign unlock = (state == 4b1111)? 1b1:1b0;
 assign leds = state;
 
 endmodule
