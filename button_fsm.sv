@@ -39,11 +39,12 @@ module button_fsm (
 //     S0 = 2'b00, S1 = 2'b01, S2 = 2'b10, S3 = 2'b11
 //     -> Melhor para ASICs onde area e critica.
 // -----------------------------------------------------------------------------
-typedef enum logic [3:0] {
-    S0 = 4'b0001,   // Estado inicial  -- LEDR[0] aceso
-    S1 = 4'b0010,   // Estado 1        -- LEDR[1] aceso
-    S2 = 4'b0100,   // Estado 2        -- LEDR[2] aceso
-    S3 = 4'b1000    // Estado 3        -- LEDR[3] aceso
+typedef enum logic [4:0] { //cada passo 
+    S0 = 5'b00001, //passo 1 ,standby
+    S1 = 5'b00010, //passo 2 ,espera o 2 botao certo
+    S2 = 5'b00100, //passo 3 ,agora o 3
+    S3 = 5'b01000, //passo 4 ,agora o ultimo
+    S4 = 5'b10000  //passo 5 ,abriu
 } state_t;
 
 state_t state, next_state;
