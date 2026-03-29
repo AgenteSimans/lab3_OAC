@@ -75,16 +75,16 @@ state_t state, next_state;
 //     btn_prev:   _______________|-----------------|_
 //     btn_rise:   _____________|-|___________________ <- pulso de 1 ciclo
 // -----------------------------------------------------------------------------
-logic btn_active;  // Botao em logica positiva (1 = pressionado)
-logic btn_prev;    // Valor do botao no ciclo anterior
-logic btn_rise;    // Pulso de 1 ciclo na borda de subida
+logic [3:0] btn_active;  // Botao em logica positiva (1 = pressionado)
+logic [3:0] btn_prev;    // Valor do botao no ciclo anterior
+logic [3:0] btn_rise;    // Pulso de 1 ciclo na borda de subida
 
 assign btn_active = ~btn;
 assign btn_rise   = btn_active & ~btn_prev;  // Borda de subida
 
 // Registra o estado anterior do botao (FF simples)
 always_ff @(posedge clk or negedge rst_n) begin
-    if (!rst_n) btn_prev <= 1'b0;
+    if (!rst_n) btn_prev <= 4'b0000;
     else        btn_prev <= btn_active;
 end
 
@@ -134,15 +134,33 @@ end
 //     -> Avisa se um case nao for coberto (junto com default).
 // -----------------------------------------------------------------------------
 always_comb begin
-    next_state = state;  // Default: mantem estado se nao houver borda
+    next_state = state;   // default
 
-    unique case (state)
-        S0: if (btn_rise) next_state = S1;
-        S1: if (btn_rise) next_state = S2;
-        S2: if (btn_rise) next_state = S3;
-        S3: if (btn_rise) next_state = S0;  // Volta ao inicio -> ciclo
-        default:          next_state = S0;
-    endcase
+    // Só processa botões se não estiver destravado
+    if (state != S4) begin
+        if (btn_rise != 4'b0000) begin
+            // Verifica se mais de um botão foi pressionado
+            if ($countones(btn_rise) > 1) begin // descobri essa funcao,mas n tenho ideia se pode
+                next_state = S0;
+            end
+            else begin
+                // Exatamente um botão pressionado
+                case (state)
+                    S0: if (btn_rise == 4'b0001) next_state = S1;
+                        else next_state = S0;       // já está em S0, mas explícito
+                    S1: if (btn_rise == 4'b0010) next_state = S2;
+                        else next_state = S0;
+                    S2: if (btn_rise == 4'b0100) next_state = S3;
+                        else next_state = S0;
+                    S3: if (btn_rise == 4'b1000) next_state = S4;
+                        else next_state = S0;
+                    default: next_state = S0;
+                endcase
+            end
+        end
+        // se btn_rise == 0, mantém estado (já foi atribuído como default)
+    end
+    // se state == S4, next_state já é S4 (pelo default) e ignora botões
 end
 
 // -----------------------------------------------------------------------------
