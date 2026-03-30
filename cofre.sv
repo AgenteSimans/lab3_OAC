@@ -49,7 +49,7 @@ always_comb begin
             else if (btn_rise == 4'b0000)  next_state = S1;
             else                          next_state = S0;
         
-        S2: if      (btn_rise == 4'b0100)  next_state = S3;
+        S2: if      (btn_rise == 4'b0010)  next_state = S3;
             else if (btn_rise == 4'b0000)  next_state = S2;
             else                          next_state = S0;
         

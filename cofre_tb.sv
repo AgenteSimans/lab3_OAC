@@ -42,7 +42,7 @@ module cofre_tb;
         repeat (hold_cycles) @(posedge clk);
         @(negedge clk);
         btn = 4'b1111;                 // Solta tudo
-        repeat (3) @(posedge clk);    // Aguarda borda ser detectada
+        repeat (3) @(posedge clk);   // Aguarda borda ser detectada
     endtask
 
     // -------------------------------------------------------------------------
@@ -94,16 +94,16 @@ module cofre_tb;
         // ------------------------------------------------------------------
         $display("\n=== Teste 2: Sequencia correta S0->S1->S2->S3->S4 ===");
 
-        press_button(4'b0001, 2);   // btn0 em S0 -> deve ir para S1
+        press_button(4'b0001, 2);   // btn0 azul em S0 -> deve ir para S1
         check_state(4'b0010, "btn0 em S0 -> S1");
 
-        press_button(4'b0010, 2);   // btn1 em S1 -> deve ir para S2
+        press_button(4'b0010, 2);   // btn1 amarelo em S1 -> deve ir para S2
         check_state(4'b0100, "btn1 em S1 -> S2");
 
-        press_button(4'b0100, 2);   // btn2 em S2 -> deve ir para S3
+        press_button(4'b0010, 2);   // btn1 amarelo em S2 -> deve ir para S3
         check_state(4'b1000, "btn2 em S2 -> S3");
 
-        press_button(4'b1000, 2);   // btn3 em S3 -> deve ir para S4 (aberto)
+        press_button(4'b1000, 2);   // btn3 vermelho em S3 -> deve ir para S4 (aberto)
         check_state(4'b1111, "btn3 em S3 -> S4 (aberto)");
 
         // ------------------------------------------------------------------
@@ -161,7 +161,7 @@ module cofre_tb;
 
         press_button(4'b0001, 2);   // S0->S1
         press_button(4'b0010, 2);   // S1->S2
-        press_button(4'b0100, 2);   // S2->S3
+        press_button(4'b0010, 2);   // S2->S3
         press_button(4'b1000, 2);   // S3->S4
         check_state(4'b1111, "Chegou em S4");
 
