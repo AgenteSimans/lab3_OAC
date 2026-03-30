@@ -1,10 +1,11 @@
 
 
-module button_fsm (
+module cofre (
     input  logic       clk,    // Clock de 50 MHz
     input  logic       rst_n,  // Reset assincrono, ativo baixo (KEY[0])
     input  logic [3:0] btn,    // Botao de avanco, ativo baixo  (KEY[1])
-    output logic [3:0] leds    // LEDs indicadores de estado
+    output logic [3:0] leds,   // LEDs indicadores de estado
+    output logic       unlock
 );
 
 typedef enum logic [3:0] {
@@ -12,7 +13,7 @@ typedef enum logic [3:0] {
     S1 = 4'b0010,   // Estado 1        -- LEDR[1] aceso
     S2 = 4'b0100,   // Estado 2        -- LEDR[2] aceso
     S3 = 4'b1000,   // Estado 3        -- LEDR[3] aceso
-    S1 = 4'b1111
+    S4 = 4'b1111    // Estado 4        -- Todos os LEDs apagados
 } state_t;
 
 state_t state, next_state;
@@ -42,18 +43,18 @@ always_comb begin
     next_state = state;  // Default: mantem estado se nao houver borda
 
     unique case (state)
-        S0: if      (btn_rise == 4b0001)  next_state = S1;
+        S0: if      (btn_rise == 4'b0001)  next_state = S1;
 
-        S1: if      (btn_rise == 4b0010)  next_state = S2;
-            else if (btn_rise == 4b0000)  next_state = S1;
+        S1: if      (btn_rise == 4'b0010)  next_state = S2;
+            else if (btn_rise == 4'b0000)  next_state = S1;
             else                          next_state = S0;
         
-        S2: if      (btn_rise == 4b0100)  next_state = S3;
-            else if (btn_rise == 4b0000)  next_state = S2;
+        S2: if      (btn_rise == 4'b0010)  next_state = S3;
+            else if (btn_rise == 4'b0000)  next_state = S2;
             else                          next_state = S0;
         
-        S3: if      (btn_rise == 4b1000)  next_state = S4;  // Volta ao inicio -> ciclo
-            else if (btn_rise == 4b0000)  next_state = S3;
+        S3: if      (btn_rise == 4'b1000)  next_state = S4;  // Volta ao inicio -> ciclo
+            else if (btn_rise == 4'b0000)  next_state = S3;
             else                          next_state = S0;
         
         S4: next_state = S4;
@@ -61,6 +62,7 @@ always_comb begin
     endcase
 end
 
+assign unlock = (state == 4'b1111)? 1'b1:1'b0;
 assign leds = state;
 
 endmodule
